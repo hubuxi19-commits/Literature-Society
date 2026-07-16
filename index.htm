@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统安全警告</title>
+    <style>
+        /* 全局重置与基础样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            background-color: #0b0c10; /* 深黑色背景 */
+            color: #c5c6c7;
+            transition: background-color 0.5s ease;
+        }
+
+        /* 统一卡片容器 */
+        .card {
+            background: #1f2833; /* 暗灰蓝色背景 */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #1f2833;
+            transition: all 0.5s ease;
+        }
+
+        /* ------------------ 界面 1: 风险警告页 ------------------ */
+        #warning-screen {
+            border: 1px solid #d32f2f; /* 红色警告边框 */
+        }
+        .warn-icon {
+            font-size: 64px;
+            color: #d32f2f;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+        .warn-title {
+            color: #ffffff;
+            font-size: 22px;
+            margin: 0 0 15px 0;
+            font-weight: bold;
+        }
+        .warn-text {
+            color: #a9a9a9;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+            background: rgba(211, 47, 47, 0.05);
+            padding: 15px;
+            border-left: 3px solid #d32f2f;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+        .warn-btn {
+            background-color: #d32f2f;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
+            transition: background-color 0.2s;
+        }
+        .warn-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* ------------------ 界面 2: 人机交互界面 ------------------ */
+        #verify-screen {
+            display: none;
+            border: 1px solid #45f3ff;
+        }
+        .verify-title {
+            color: #ffffff;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+        }
+        .verify-subtitle {
+            font-size: 14px;
+            color: #a9a9a9;
+            margin-bottom: 20px;
+        }
+        .highlight {
+            color: #45f3ff;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+        .captcha-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        canvas {
+            border: 1px solid #45f3ff;
+            border-radius: 8px;
+            cursor: crosshair;
+            background-color: #0b0c10;
+            display: block;
+        }
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: #45f3ff;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+        }
+        .refresh-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* ------------------ 界面 3: 欢迎加入界面 ------------------ */
+        #success-screen {
+            display: none;
+            border: 1px solid #2e7d32;
+            background: #1a2e1a; /* 墨绿色背景 */
+        }
+        .success-icon {
+            font-size: 64px;
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+        .success-title {
+            color: #ffffff;
+            font-size: 22px;
+            margin: 0 0 10px 0;
+        }
+        .success-text {
+            color: #a5d6a7;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        #real-qr {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+            border: 2px solid #4caf50;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #ffffff; /* 二维码通常需要白色背景确保识别率 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= 阶段 1: 风险警告页 ================= -->
+    <div class="card" id="warning-screen">
+        <div class="warn-icon">⚠️</div>
+        <div class="warn-title">系统安全警告</div>
+        <div class="warn-text">
+            <strong>提示：您正在尝试进入文学社核心区域。</strong><br><br>
+            检测到继续前进可能面临以下“安全隐患”：<br>
+            1. 可能会被迫阅读大量优秀文学作品；<br>
+            2. 可能会被迫参与深度思想碰撞和创作讨论；<br>
+            3. 可能会结识志同道合但性格古怪的文字爱好者。<br><br>
+            请问您是否仍要加入文学社？
+        </div>
+        <button class="warn-btn" id="proceedBtn">无视风险，继续加入文学社</button>
+    </div>
+
+    <!-- ================= 阶段 2: 点选验证页 ================= -->
+    <div class="card" id="verify-screen">
+        <div class="verify-title">身份安全校验</div>
+        <div class="verify-subtitle">请依次点击下方图中的：<br><span class="highlight">“文”</span>、<span class="highlight">“学”</span>、<span class="highlight">“社”</span></div>
+        
+        <div class="captcha-container">
+            <canvas id="captchaCanvas" width="300" height="150"></canvas>
+        </div>
+        
+        <div>
+            <button class="refresh-btn" id="refreshBtn">看不清？刷新验证码</button>
+        </div>
+    </div>
+
+    <!-- ================= 阶段 3: 欢迎加入页 ================= -->
+    <div class="card" id="success-screen">
+        <div class="success-icon">✨</div>
+        <div class="success-title">欢迎加入文学社！</div>
+        <div class="success-text">安全验证已通过。<br>请长按或扫描下方二维码完成最终入群登记：</div>
+        <img id="real-qr" alt="文学社官方二维码">
+    </div>
+
+    <script>
+        // 【核心配置】请在这里替换为您文学社的真实二维码图片直链
+        const REAL_QR_CODE_URL = "https://yourdomain.com/path/to/real-qrcode.png";
+
+        // 页面 DOM 元素
+        const warningScreen = document.getElementById('warning-screen');
+        const verifyScreen = document.getElementById('verify-screen');
+        const successScreen = document.getElementById('success-screen');
+        
+        const proceedBtn = document.getElementById('proceedBtn');
+        const canvas = document.getElementById('captchaCanvas');
+        const ctx = canvas.getContext('2d');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const realQrImg = document.getElementById('real-qr');
+
+        // 验证码配置
+        const targetChars = ['文', '学', '社'];
+        const distractorPool = ['书', '诗', '画', '礼', '乐', '思', '墨', '琴', '茶', '雅'];
+        let charPositions = []; 
+        let currentStep = 0;    
+        let clickedMarkers = []; 
+
+        // ------------------ 状态切换逻辑 ------------------
+        
+        // 从警告页进入验证页
+        proceedBtn.addEventListener('click', () => {
+            // 切换卡片显示
+            warningScreen.style.display = 'none';
+            verifyScreen.style.display = 'block';
+            // 切换网页整体背景，让验证页显得稍微明亮或科技感一些
+            document.body.style.backgroundColor = '#1c1d22';
+            // 初始化验证码
+            initCaptcha();
+        });
+
+        // ------------------ 验证码核心逻辑 ------------------
+
+        function initCaptcha() {
+            currentStep = 0;
+            clickedMarkers = [];
+            charPositions = [];
+            drawBackground();
+
+            // 生成不重叠的 3x2 网格坑位
+            const cells = [
+                { x: 50, y: 40 },  { x: 150, y: 40 },  { x: 250, y: 40 },
+                { x: 50, y: 110 }, { x: 150, y: 110 }, { x: 250, y: 110 }
+            ];
+            // 打乱网格
+            for (let i = cells.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cells[i], cells[j]] = [cells[j], cells[i]];
+            }
+
+            // 组装字符：3个目标 + 2个干扰
+            const renderList = [];
+            targetChars.forEach((char, index) => {
+                renderList.push({ char: char, isTarget: true, targetIndex: index });
+            });
+            const shuffledDistractors = [...distractorPool].sort(() => 0.5 - Math.random());
+            for (let i = 0; i < 2; i++) {
+                renderList.push({ char: shuffledDistractors[i], isTarget: false });
+            }
+
+            // 绘制文字
+            renderList.forEach((item, index) => {
+                const cell = cells[index];
+                const offsetX = (Math.random() - 0.5) * 15;
+                const offsetY = (Math.random() - 0.5) * 15;
+                const finalX = cell.x + offsetX;
+                const finalY = cell.y + offsetY;
+
+                item.x = finalX;
+                item.y = finalY;
+                charPositions.push(item);
+                drawCharacter(item);
+            });
+        }
+
+        // 绘制 Canvas 背景
+        function drawBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 科技感/暗色微光渐变
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1f2833');
+            gradient.addColorStop(1, '#0b0c10');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制彩色干扰线
+            for (let i = 0; i < 5; i++) {
+                ctx.strokeStyle = `rgba(${randomInt(100, 255)}, ${randomInt(100, 255)}, ${randomInt(100, 255)}, 0.25)`;
+                ctx.lineWidth = randomInt(1, 2);
+                ctx.beginPath();
+                ctx.moveTo(randomInt(0, canvas.width), randomInt(0, canvas.height));
+                ctx.lineTo(randomInt(0, canvas.width), randomInt(0, canvas.height));
+                ctx.stroke();
+            }
+
+            // 绘制干扰点
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = `rgba(${randomInt(100, 255)}, ${randomInt(100, 255)}, ${randomInt(100, 255)}, 0.3)`;
+                ctx.beginPath();
+                ctx.arc(randomInt(0, canvas.width), randomInt(0, canvas.height), randomInt(1, 2), 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        // 绘制混淆汉字
+        function drawCharacter(item) {
+            ctx.save();
+            ctx.translate(item.x, item.y);
+            
+            const angle = (randomInt(-20, 20) * Math.PI) / 180;
+            ctx.rotate(angle);
+
+            const fontSize = randomInt(28, 32);
+            ctx.font = `bold ${fontSize}px "STKaiti", "KaiTi", "Microsoft YaHei", sans-serif`;
+            
+            // 使用亮色字，确保暗色背景下可以被看清
+            ctx.fillStyle = `rgb(${randomInt(150, 255)}, ${randomInt(150, 255)}, ${randomInt(150, 255)})`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = "rgba(255, 255, 255, 0.2)";
+
+            ctx.fillText(item.char, 0, 0);
+            ctx.restore();
+        }
+
+        // 处理点击
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const clickX = (clientX - rect.left) * scaleX;
+            const clickY = (clientY - rect.top) * scaleY;
+
+            const expectedChar = targetChars[currentStep];
+            const targetObj = charPositions.find(item => item.char === expectedChar);
+
+            if (!targetObj) return;
+
+            const distance = Math.sqrt(Math.pow(clickX - targetObj.x, 2) + Math.pow(clickY - targetObj.y, 2));
+
+            if (distance < 28) {
+                // 点击正确，记录并画圈
+                clickedMarkers.push({ x: clickX, y: clickY, label: currentStep + 1 });
+                drawMarker(clickX, clickY, currentStep + 1);
+                
+                currentStep++;
+
+                if (currentStep === targetChars.length) {
+                    onSuccess();
+                }
+            } else {
+                alert("点击顺序错误，安全检测判定失败，验证码已刷新。");
+                initCaptcha();
+            }
+        }
+
+        // 绘制成功点击步骤反馈（蓝色亮色光圈）
+        function drawMarker(x, y, num) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, 2 * Math.PI);
+            ctx.fillStyle = '#45f3ff'; // 亮蓝色
+            ctx.fill();
+            
+            ctx.fillStyle = '#0b0c10';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(num, x, y);
+            ctx.restore();
+        }
+
+        // 验证成功转换
+        function onSuccess() {
+            // 加载真实二维码
+            realQrImg.src = REAL_QR_CODE_URL;
+
+            setTimeout(() => {
+                verifyScreen.style.display = 'none';
+                successScreen.style.display = 'block';
+                document.body.style.backgroundColor = '#0f1f11'; // 背景转为舒适的墨绿，烘托欢迎气氛
+            }, 500);
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 事件绑定
+        refreshBtn.addEventListener('click', initCaptcha);
+        canvas.addEventListener('mousedown', handleCanvasClick);
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault(); 
+            handleCanvasClick(e);
+        }, { passive: false });
+    </script>
+</body>
+</html>
